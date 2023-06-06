@@ -1,0 +1,54 @@
+body{
+    text-align: center;
+    padding: 10px 10%;
+}
+
+header > h2 {
+    font-style: italic;
+    color: blueviolet;
+    text-shadow: 1px 1px yellow;
+}
+
+footer > h6 {
+    color: teal;
+}
+
+section h5 {
+    font-style: italic;
+    font-weight: bold;
+    font-size: 13pt;
+    color: navy;
+}
+
+section {
+    border: 1px solid silver;
+    border-radius: 15px;
+    margin: 10px 0px;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 5px 5px 20px silver;
+    padding-bottom: 30px;
+}
+
+th {
+    font: bold 12pt 'Consolas' !important;
+    color: teal !important;
+}
+
+td {
+    font: 11pt 'Trebuchet MS';
+}
+
+button {
+    width: 70%;
+    margin-bottom: 5px;
+}
+
+#view-panel {
+width: 100%;
+height: 450px;
+}
+
+canvas {
+    border: 1px solid silver;
+}

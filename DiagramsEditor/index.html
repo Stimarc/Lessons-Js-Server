@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор Діаграм</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="icon" href="assets/img/favicon.ico">
+</head>
+
+<body>
+    <header>
+        <h2>Редактор Діаграм</h2>
+        <hr>
+    </header>
+    <main>
+        <div class="row">
+            <div class="col-md-4">
+                <section id="data-view">
+                    <h5>Перегляд даних</h5>
+                    <hr>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Величина</th>
+                                <th>Значення</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data Placeholder -->
+                        </tbody>
+                    </table>
+                </section>
+                <section id="data-control">
+                    <h5>Управління даними</h5>
+                    <hr>
+                    <button id="load-btn" class="btn btn-sm btn-secondary">Завантажити дані</button>
+                    <button id="reset-btn" class="btn btn-sm btn-secondary">Очистити дані</button>
+                    <button id="rect-btn" class="btn btn-sm btn-secondary">Стовпчаста діаграма</button>
+                    <button id="circle-btn" class="btn btn-sm btn-secondary">Колова діаграма</button>
+                </section>
+            </div>
+            <div class="div col-md-8">
+                <section id="diagram-view">
+                    <h5>Перегляд діаграм</h5>
+                    <hr>
+                    <div id="view-panel">
+                        <canvas id="canvas-panel" width="700" height="450">
+                            Ваш браузер не підтримує технологію Canvas!
+                            Для використання даної сторінки оновіть ваш браузер!
+                        </canvas>
+                        <div style="display: none">
+                            <img id="logo-image" src="assets/img/logo.png" alt="...">
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <hr>
+        <h6>
+            Copyright: &copy; Комп'ютерна Академія IT-STEP&trade; - Kyiv, 2023
+        </h6>
+    </footer>
+    <!-- Js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <script type="module" src="assets/js/drawer.js"></script>
+    <script type="module" src="assets/js/controller.js"></script>
+    <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
