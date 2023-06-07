@@ -1,7 +1,7 @@
 export class Drawer {
   // Props:
-  context = null;                  // - посилання на вміст графічної панелі canvas
-  colors = [                       // - масив кольорів для зафарбування діаграм
+  context = null;                   // - посилання на вміст графічної панелі canvas
+  colors = [                        // - масив кольорів для зафарбування діаграм
     'red', 'green', 'blue', 'purple', 'orange', 'gray',
     'darkcyan', 'bisque', 'silver', 'lavander', 'navy'
   ];
@@ -35,7 +35,11 @@ export class Drawer {
     g.lineTo(10, this.canvasHeight - 10);
     g.lineTo(this.canvasWidth - 10, this.canvasHeight - 10);
     g.stroke();
+  }
 
+  generateRandomColor() {
+    const randomIndex = Math.floor(Math.random() * this.colors.length);
+    return this.colors[randomIndex];
   }
 
   buildRectangles(g, results, names) {
@@ -53,13 +57,11 @@ export class Drawer {
         let x = i * (W + 5) + 10;
         let y = this.canvasHeight - 10 - h;
         // ->
-        g.fillStyle = this.colors[i];
+        let color = this.generateRandomColor();
+        g.fillStyle = color;
         g.fillRect(x, y, W, h);
         g.fillText(names[i], x + 5, y - 5);
       }
     }
   }
-  
-
 }
-
