@@ -65,11 +65,19 @@ export class Controller {
       });
    }
 
-   activaRectButton() {
+   activateRectButton() {
       $('#rect-btn').click(() => {
-          console.log('RectButton -> Click');
-          let context = this.drawer.context
-          this.drawer.buildRectangles(context,this.results,this.names);
+         console.log('RectButton -> Click');
+         let context = this.drawer.context
+         this.drawer.buildRectangles(context, this.results, this.names);
+      });
+   }
+
+   activateCircleButton() {
+      $('#circle-btn').click(() => {
+           console.log('CircleButton -> Click');
+           let context = this.drawer.context;
+           this.drawer.buildPies(context,this.results,this.names);
       });
    }
 }

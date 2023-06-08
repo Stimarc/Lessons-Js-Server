@@ -2,7 +2,7 @@ export class Drawer {
   // Props:
   context = null;                   // - посилання на вміст графічної панелі canvas
   colors = [                        // - масив кольорів для зафарбування діаграм
-    'red', 'green', 'blue', 'purple', 'orange', 'gray',
+    'coral', 'lightgreen', 'lightblue', 'purple', 'orange', 'lightgray',
     'darkcyan', 'bisque', 'silver', 'lavander', 'navy'
   ];
   canvasWidth = 700;
@@ -63,5 +63,71 @@ export class Drawer {
         g.fillText(names[i], x + 5, y - 5);
       }
     }
+  }
+
+  buildPies(g,results,names) {
+    let N = results.length;
+    if (N === 0) {
+      alert('Ви не завантажили дані для побудови!');
+    } else {
+        console.log('Побудова колової діаграми ...');
+        let centerX = this.canvasWidth  /2;
+        let centerY = this.canvasHeight /2;
+        let radius = 100;
+        g.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        g.strokeStyle = this.colors[5];
+        g.lineWidth = 2;
+        // ->
+        let s = 0;
+        for (let x of results) {
+            s += x;
+        }
+        let k = s / (2 * Math.PI);
+        console.log(s);
+        console.log(k);
+           // ->
+            let lastAngle = 0;
+            for (let i = 0; i < N; i++) {
+            let a1 = 0;
+            let a2 = 0;
+            // ->
+          if (i == 0) {
+             a1 = 0;
+             a2 = results[i]/ k;
+          } else {
+             a1 = lastAngle;
+             a2 = lastAngle + results[i]/ k;
+          }
+            // ->
+            lastAngle = a2;
+            g.fillStyle = this.colors[i];
+            // ->
+            g.beginPath();
+            g.moveTo(centerX,centerY);
+            g.arc(centerX,centerY,radius, a1, a2);
+            // ->
+            g.lineTo(centerX,centerY);
+            g.stroke();
+            g.fill();
+        }
+
+
+
+
+        
+
+
+
+
+  
+
+        g.fillStyle = this.colors[2];
+        g.beginPath();
+        g.moveTo(centerX,centerY);
+        g.arc(centerX,centerY,100, Math.PI / 4, 3 * Math.PI / 4);
+        g.lineTo(centerX,centerY);
+        g.stroke();
+        g.fill();
+    } 
   }
 }
