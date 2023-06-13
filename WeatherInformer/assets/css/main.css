@@ -1,0 +1,85 @@
+body{
+    text-align: center;
+    padding: 5px 5%;
+    font: 12pt 'Comic Sans MS';
+    color: grey;
+}
+
+header > h1 {
+    color: purple;
+}
+
+footer > h4 {
+    color: teal;
+}
+
+fieldset {
+    margin-top: 15px;
+    border: 1px solid gray;
+    border-radius: 15px;
+}
+
+legend {
+    text-align: left;
+    color: navy;
+}
+
+#city {
+    width:60%;
+    padding: 5px;
+    color: red;
+}
+
+button {
+    width: 200px;
+    border-radius: 10px;
+    padding: 5px;
+}
+
+button:hover {
+    color: white;
+    background: grey;
+    cursor: pointer;
+    outline: 0;
+}
+
+#display {
+    width: 85%;
+    border: 1px solid silver;
+    border-radius: 15px;
+    padding: 5px 20px 30px 20px;
+    margin: 20px auto;
+    box-shadow: 5px 5px 20px silver;
+}
+
+#data {
+    width: 60%;
+    margin: 20px auto;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 80%;
+    margin: 5px auto;
+    margin-bottom: 10px;
+}
+
+td,
+th {
+    font-family: 'Consolas';
+    padding: 5px;
+}
+
+.param {
+    text-align: right;
+    padding-left: 15px;
+}
+
+.value {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.icon {
+    width: 150px;
+}
