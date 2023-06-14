@@ -1,0 +1,121 @@
+body {
+    text-align: center;
+    padding: 5px 5%;
+    font: 'Canit';
+
+}
+
+
+header>h1 {
+    color: darkblue;
+}
+
+footer>h4 {
+    color: rgb(19, 168, 168);
+}
+
+fieldset {
+    margin-top: 15px;
+    border: 1px solid gray;
+    border-radius: 15px;
+}
+
+legend {
+    text-align: center;
+    color: rgb(21, 21, 195);
+}
+
+#city {
+    width: 60%;
+    padding: 5px;
+    color: blueviolet;
+}
+
+
+label {
+    display: block;
+    font-size: 18px;
+    color: darkblue;
+}
+
+#display {
+    width: 85%;
+    border: 1px solid silver;
+    border-radius: 15px;
+    padding: 5px 20px 30px 20px;
+    margin: 20px auto;
+    box-shadow: 5px 5px 20px silver;
+}
+
+#data {
+    width: 70%;
+    margin: 20px auto;
+    margin-bottom: 30px;
+}
+
+table {
+    width: 80%;
+    margin: 5px auto;
+    margin-bottom: 10px;
+}
+
+
+
+#get-weather {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: rgb(0, 238, 0);
+    color: #fff;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#res-weather {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: rgb(255, 7, 7);
+    color: #fff;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.weather-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.weather-icon {
+    margin-bottom: 10px;
+}
+
+.weather-icon img {
+    width: 100px;
+    height: 100px;
+}
+
+.weather-description {
+    color: blueviolet;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.temperature {
+    display: flex;
+}
+.time{
+    font: 'Comic Sans MS';
+    color: royalblue;
+    margin-right: 10px;
+    font-size: 16px;
+}
+.temperature-value {
+    font: 'Comic Sans MS';
+    color: rgb(218, 215, 11);
+    margin-left: 10px;
+    font-size: 16px;
+}
