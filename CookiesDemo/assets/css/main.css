@@ -1,0 +1,62 @@
+#main-box{
+    color: gray;
+    text-align: center;
+    width: 50%;
+    margin: 30px auto;
+    font: 12pt 'Trebuchet MS';
+}
+
+h2 {
+    color: purple;
+}
+
+fieldset {
+    border: 1px solid gray;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 35px;
+}
+
+legend {
+    text-align: left;
+    font-style: italic;
+    color: turquoise;
+}
+
+.group-box {
+    display: inline-block;
+    text-align: left;
+}
+
+input {
+    padding: 5px;
+    width: 150px;
+}
+
+label {
+    color: navy;
+}
+
+button {
+    width: 85px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    margin: 2px;
+}
+
+button:hover {
+    color: white;
+    background: gray;
+    cursor: pointer;
+}
+
+table {
+    width: 75%;
+    margin: 10px auto;
+}
+
+th,
+td {
+    padding: 5px;
+}
