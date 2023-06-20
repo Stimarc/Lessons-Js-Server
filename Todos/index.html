@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/main.css">
+    <title></title>
+</head>
+<body>
+    <div class="container">
+        <h1>todo list</h1>
+
+        <form  class="add-todo" name="addTodoForm">
+            <label class="add-todo_input">
+                <input type="text" name="addTodoInput">
+            </label>
+            <button class="add-todo_btn" name="addTodoBtn">add todo</button>
+        </form>
+
+        <div class="todos-block">
+            <ul class="todo-list">
+                <li class="todo-item">
+                    <label class="todo_item_input">
+                        <input type="checkbox" name="completed">
+                    </label>
+                    <p class="todo_item_text">todo 1</p>
+                    <div class="todo-item-btns">
+                        <button class="action-btn action-btn-del">x</button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Js -->
+    <script src="./js/main.js"></script>
+</body>
+
+</html>
