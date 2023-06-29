@@ -1,0 +1,29 @@
+h1 {
+    text-align: center;
+    color: purple;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+h2 {
+    text-align: center;
+    color: blueviolet;
+}
+
+p {
+    color: crimson;
+    text-align: center;
+}
+
+.product-image {
+    width: 200px;
+    height: 100%;
+    margin: 25px;
+  
+}
+
+
+.product-card {
+    width: 250px;
+    border: 2px solid silver;
+    margin: 15px;
+}
