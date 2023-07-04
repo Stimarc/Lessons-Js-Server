@@ -1,8 +1,18 @@
 const doc = document;
 const productsSelector = '.products';
+const cart = {
+  1: 2,
+  2: 3,
+  3: 1,
+};
 
-for (let product of products) {
-  renderProduct(product, productsSelector);
+renderProducts(products, productsSelector);
+renderCart(products, cart, 'body');
+
+function renderProducts(dataArr, insertSelector) {
+  for (let product of dataArr) {
+    renderProduct(product, insertSelector);
+  }
 }
 
 function renderProduct(prodObj, insertSelector) {
@@ -42,6 +52,7 @@ append, prepend, before, after, replaceWith
   productPriceBlock.className = 'product-price-block';
   productPrice.className = 'product-price';
   productPrice.innerHTML = price;
+  
   addCart.className = 'add-cart';
   addCart.innerHTML = 'Add cart'
   productPriceBlock.append(productPrice, addCart);
@@ -57,4 +68,69 @@ append, prepend, before, after, replaceWith
   );
 
   parentEl.append(product);
+
+  // events
+  addCart.onclick = addCartHandler;
+}
+
+function renderCart(dataArr, cartProdsObj, insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+
+  const 
+    cart = doc.createElement('div'),
+    cartTitle = doc.createElement('h3'),
+    cartProds = doc.createElement('ul');
+
+  if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+
+  cart.className = 'cart';
+
+  cartTitle.className = 'cart-title';
+  cartTitle.innerText = 'Cart';
+
+  cartProds.className = 'cart-prods';
+
+  parentEl.append(cart);
+  cart.append(cartTitle, cartProds);
+
+  // render cart component
+  renderCartProds(dataArr, cartProdsObj, '.cart-prods');
+  renderCartTotal(5000, '.cart');
+}
+
+function renderCartProds(dataArr, cartProdsObj, insertSelector) {
+  let count = 1;
+
+  for (id in cartProdsObj) {
+    const qty = cartProdsObj[id];
+    const prod = dataArr.find(item => item.id == id);
+
+    renderCartProd(prod, qty, count, insertSelector);
+    count ++;
+  }
+}
+
+function renderCartProd(prodObj, cartProdQty, count,  insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+
+  console.log(prodObj);
+  console.log(cartProdQty);
+  console.log(insertSelector);
+}
+
+function renderCartTotal(totalSum, insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+
+  console.log('render cart total');
+  console.log(parentEl);
+}
+
+// events
+function addCartHandler() {
+  const id = this.closest('.product').dataset.id;
+  
+  cart[id] = !cart[id] ? 1 : cart[id] + 1;
 }
