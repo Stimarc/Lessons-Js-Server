@@ -271,3 +271,4 @@ function addCartHandler() {
 
   cart[id] = !cart[id] ? 1 : cart[id] + 1;
 }
+
