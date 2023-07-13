@@ -3,16 +3,11 @@ const productsSelector = '.products';
 const btnCart = doc.querySelector('.mini-cart');
 let isCart = false;
 let products = [];
-let cart = {}
+let cart = {};
 const urls = {
-  products: "http://localhost:3000/products",
-  cart: "http://localhost:3000/cart"
+  products: 'http://localhost:3000/products',
+  cart: 'http://localhost:3000/cart',
 };
-
-
-
-
-
 
 // queries
 fetch(urls.products)
@@ -20,15 +15,19 @@ fetch(urls.products)
   .then(data => {
     products = data;
     renderProducts(products, productsSelector);
-  })
-  
-
-
+  });
 
 // events
 btnCart.onclick = function() {
   if (!isCart) {
-    renderCart(products, cart, 'body');
+
+    fetch(urls.cart)
+      .then(res => res.json())
+      .then(data => {
+        cart = data;
+        renderCart(products, cart, 'body');
+      });
+    
   } else {
     closeCart('.cart');
   }
@@ -256,9 +255,24 @@ function getTotalCartSum(dataArr, cartProdsObj) {
   return total;
 }
 
-// Handlers
+// HANDLERS
 function addCartHandler() {
   const id = this.closest('.product').dataset.id;
   
-  cart[id] = !cart[id] ? 1 : cart[id] + 1;
+  fetch(urls.cart)
+  .then(res => res.json())
+  .then(data => {
+    cart = data;
+    cart[id] = !cart[id] ? 1 : cart[id] + 1;
+
+    fetch(urls.cart, {
+      method: 'post',
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: JSON.stringify(cart)
+    });
+
+  });
+  
 }
