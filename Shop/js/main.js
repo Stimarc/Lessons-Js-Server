@@ -1,13 +1,25 @@
 const doc = document;
-const productsSelector = '.products';
-const btnCart = doc.querySelector('.mini-cart');
-let isCart = false;
-let products = [];
-let cart = {};
 const urls = {
   products: 'http://localhost:3000/products',
   cart: 'http://localhost:3000/cart',
 };
+const productsSelector = '.products';
+const btnCart = doc.querySelector('.mini-cart');
+
+
+let products = [];
+let cart = {};
+
+let isCart = false;
+let isAuth = true;
+
+
+
+// - Main Block ===================
+
+RenderLoginBtn('user-action');
+
+isAuth && renderAddProductBtn('.user-action');
 
 // queries
 fetch(urls.products)
@@ -34,6 +46,76 @@ btnCart.onclick = function() {
 }
 
 // FUNCTIONS -------------------------------------
+function renderModalWindow(insertSelector,renderClassName) {
+  const parentEl = checkPresentElements(insertSelector,renderClassName);
+  if (!parentEl) {
+    return false;
+  }
+
+  const
+  modalWindow = doc.createElement('div'),
+  modalWindowTitle = doc.createElement('h3'),
+  modalWindowContent = doc.createElement('button');
+
+  modalWindow.className = renderClassName;
+
+  modalWindowTitle.className = `${renderClassName}-title`;
+  modalWindowTitle.innerText = title;
+
+  modalWindowContent.className = `${renderClassName}-content`;
+
+  modalWindowCloseBtn.className = `${renderClassName}-close-btn`;
+  modalWindowCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  
+}
+
+function RenderLoginBtn(insertSelector) {
+const el = doc.querySelector(insertSelector);
+const renderSelector = '.login';
+const renderEl = doc.querySelector('.' + renderSelector);
+
+
+  const parentEl = doc.querySelector(insertSelector);
+  if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+}
+const loginBtn = doc.createElement('button');
+
+loginBtn.className = 'login button-icon';
+
+loginBtn.dataset.title = !isAuth
+? 'login'
+: 'logout';
+loginBtn.innerHTML = !isAuth 
+? '<i class="fa solid fa-right-to-bracket"></i>'
+: '<i class="fa solid fa-right-from-bracket"></i>';
+
+
+el.before(loginBtn);
+
+//events
+loginBtn.onclick = !isAuth
+? loginBtnHandler
+: logoutBtnHandler;
+}
+
+
+function renderAddProductBtn(insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+  if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+  
+  const addProduct = doc.createElement('button');
+
+  addProduct.className = 'add-product button-icon';
+  addProduct.innerHTML = ' <i class="fa-solid fa-calendar-plus"></i>';
+
+  parentEl.prepend(addProduct);
+}
+
 
 function renderProducts(dataArr, insertSelector) {
   for (let product of dataArr) {
@@ -256,6 +338,23 @@ function getTotalCartSum(dataArr, cartProdsObj) {
 }
 
 // HANDLERS
+function loginBtnHandler() {
+  
+
+  isAuth = true;
+
+  RenderLoginBtn('.user-action');
+  renderAddProductBtn('.user-action');
+}
+
+function logoutBtnHandler() {
+  isAuth = false;
+
+  RenderLoginBtn('.user-action');
+  renderAddProductBtn('.user-action');
+}
+
+
 function addCartHandler() {
   const id = this.closest('.product').dataset.id;
   

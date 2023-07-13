@@ -37,6 +37,42 @@ button {
   background: transparent;
 }
 
+form input {
+  padding: 10px;
+  border: 1px solid silver;
+  margin-bottom: 5px;
+}
+
+form button {
+  margin: 0 auto;
+}
+
+.button-icon{
+  font-size: 30px;
+  color: white;
+  border: none;
+  padding: 0;
+  margin: 5px;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+.button-icon::before{
+  color: rgb(0, 248, 0);
+}
+
+.button-icon:hover{
+  color: rgb(0, 248, 0);
+}
+
+.cart-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
 .container {
   max-width: 1000px;
   margin: 0 auto;
@@ -136,9 +172,8 @@ button {
   background: purple;
   color: white;
 }
-
-/* cart */
-.cart {
+/* modal window */
+.madal-window{
   position: fixed;
   z-index: 1000;
   
@@ -150,6 +185,10 @@ button {
   box-shadow: 5px 5px 15px rgba(0,0,0, .3);
   background: white;
 }
+
+
+/* cart */
+.cart {}
 .cart-prods {
   padding-bottom: 20px;
   border-bottom: 5px solid silver;
@@ -247,13 +286,7 @@ button {
 
 .cart-total-value {}
 
-.cart-close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 10px;
-  cursor: pointer;
-}
+
 
 .cart-close-btn:hover {
   background: tomato;
