@@ -6,20 +6,17 @@ const urls = {
 const productsSelector = '.products';
 const btnCart = doc.querySelector('.mini-cart');
 
-
 let products = [];
 let cart = {};
 
 let isCart = false;
 let isAuth = true;
 
+// MAIN BLOCK =========================
 
-
-// - Main Block ===================
-
-RenderLoginBtn('user-action');
-
-isAuth && renderAddProductBtn('.user-action');
+renderLoginBtn('.user-action', 'login');
+renderAddProductBtn('.user-action', 'add-product');
+renderLoginForm('body', 'modal-window');
 
 // queries
 fetch(urls.products)
@@ -46,75 +43,83 @@ btnCart.onclick = function() {
 }
 
 // FUNCTIONS -------------------------------------
-function renderModalWindow(insertSelector,renderClassName) {
-  const parentEl = checkPresentElements(insertSelector,renderClassName);
+function renderLoginForm(insertSelector, renderClassName) {
+  const parentEl = checkPresentElements(insertSelector, renderClassName);
   if (!parentEl) {
     return false;
   }
 
-  const
-  modalWindow = doc.createElement('div'),
-  modalWindowTitle = doc.createElement('h3'),
-  modalWindowContent = doc.createElement('button');
-
-  modalWindow.className = renderClassName;
-
-  modalWindowTitle.className = `${renderClassName}-title`;
-  modalWindowTitle.innerText = title;
-
-  modalWindowContent.className = `${renderClassName}-content`;
-
-  modalWindowCloseBtn.className = `${renderClassName}-close-btn`;
-  modalWindowCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+  const modalWindow = renderModalWindow('body', 'modal-window', 'Enter auth data');
   
-}
+  const 
+    loginForm  = doc.createElement('form'),
+    loginInput = doc.createElement('input'),
+    pwdInput = doc.createElement('input'),
+    submitBtn = doc.createElement('button');
 
-function RenderLoginBtn(insertSelector) {
-const el = doc.querySelector(insertSelector);
-const renderSelector = '.login';
-const renderEl = doc.querySelector('.' + renderSelector);
+  loginInput.name = 'login';
+  loginInput.placeholder = 'enter login';
 
+  pwdInput.name = 'pwd';
+  pwdInput.placeholder = 'enter pwd';
+  pwdInput.type = 'password';
 
-  const parentEl = doc.querySelector(insertSelector);
-  if (!parentEl) {
-    console.error(`[${insertSelector}]: Parent element not found !!!`);
-    return false;
-}
-const loginBtn = doc.createElement('button');
+  submitBtn.innerText = 'login';
 
-loginBtn.className = 'login button-icon';
+  loginForm.append(
+    loginInput,
+    pwdInput,
+    submitBtn
+  );
 
-loginBtn.dataset.title = !isAuth
-? 'login'
-: 'logout';
-loginBtn.innerHTML = !isAuth 
-? '<i class="fa solid fa-right-to-bracket"></i>'
-: '<i class="fa solid fa-right-from-bracket"></i>';
-
-
-el.before(loginBtn);
-
-//events
-loginBtn.onclick = !isAuth
-? loginBtnHandler
-: logoutBtnHandler;
+  modalWindow.append(loginForm);
 }
 
 
-function renderAddProductBtn(insertSelector) {
-  const parentEl = doc.querySelector(insertSelector);
-  if (!parentEl) {
-    console.error(`[${insertSelector}]: Parent element not found !!!`);
+function renderLoginBtn(insertSelector, renderClassName) {
+  const el = checkPresentElements(insertSelector, renderClassName);
+  if (!el) {
     return false;
   }
+
+  const loginBtn = doc.createElement('button');
+
+  loginBtn.className = `${renderClassName} button-icon`;
   
+  loginBtn.dataset.title = !isAuth 
+    ? 'login'
+    : 'logout';
+  
+  loginBtn.innerHTML = !isAuth
+    ? '<i class="fa-solid fa-right-to-bracket"></i>'
+    : '<i class="fa-solid fa-right-from-bracket"></i>'
+
+  el.before(loginBtn);
+
+  // events
+  loginBtn.onclick = !isAuth
+    ? loginBtnHandler
+    : logoutBtnHandler;
+}
+
+function renderAddProductBtn(insertSelector, renderClassName) {
+  const parentEl = checkPresentElements(insertSelector, renderClassName);
+  if (!parentEl) {
+    return false;
+  }
+
+  if (!isAuth) {
+    return;
+  } 
+
   const addProduct = doc.createElement('button');
 
-  addProduct.className = 'add-product button-icon';
-  addProduct.innerHTML = ' <i class="fa-solid fa-calendar-plus"></i>';
+  addProduct.className = `${renderClassName} button-icon`;
+  addProduct.innerHTML = '<i class="fa-solid fa-calendar-plus"></i>';
 
   parentEl.prepend(addProduct);
 }
+
 
 
 function renderProducts(dataArr, insertSelector) {
@@ -200,14 +205,14 @@ function renderCart(dataArr, cartProdsObj, insertSelector) {
   isCart = true;
 
   cart = doc.createElement('div');
-  cart.className = 'cart';
+  cart.className = 'cart modal-window';
 
   cartTitle.className = 'cart-title';
   cartTitle.innerText = 'Cart';
 
   cartProds.className = 'cart-prods';
 
-  cartCloseBtn.className = 'cart-close-btn';
+  cartCloseBtn.className = 'modal-window-close-btn';
   cartCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
 
   parentEl.prepend(cart);
@@ -337,23 +342,75 @@ function getTotalCartSum(dataArr, cartProdsObj) {
   return total;
 }
 
+function renderModalWindow(insertSelector, renderClassName, title) {
+  const parentEl = checkPresentElements(insertSelector, renderClassName);
+  if (!parentEl) {
+    return false;
+  }
+
+  const 
+    modalWindow = doc.createElement('div'),
+    modalWindowTitle = doc.createElement('h3'),
+    modalWindowContent = doc.createElement('div'),
+    modalWindowCloseBtn = doc.createElement('button');
+
+  modalWindow.className = renderClassName;
+
+  modalWindowTitle.className = `${renderClassName}-title`;
+  modalWindowTitle.innerText = title;
+
+  modalWindowContent.className = `${renderClassName}-content`;
+
+  modalWindowCloseBtn.className = `${renderClassName}-close-btn`;
+  modalWindowCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+  parentEl.prepend(modalWindow);
+  modalWindow.append(
+    modalWindowTitle,
+    modalWindowContent,
+    modalWindowCloseBtn
+  );
+
+  // events
+
+  modalWindowCloseBtn.onclick = function() {
+    modalWindow.remove();
+  };
+
+  return modalWindowContent;
+}
+
+// additional function
+function checkPresentElements(insertSelector, renderClassName) {
+  const el = doc.querySelector(insertSelector);
+  const renderEl = doc.querySelector('.' + renderClassName);
+
+  renderEl && renderEl.remove();
+
+  if (!el) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+
+  return el;
+}
+
 // HANDLERS
 function loginBtnHandler() {
-  
+
 
   isAuth = true;
 
-  RenderLoginBtn('.user-action');
-  renderAddProductBtn('.user-action');
+  renderLoginBtn('.user-action', 'login');
+  renderAddProductBtn('.user-action', 'add-product');
 }
 
 function logoutBtnHandler() {
   isAuth = false;
 
-  RenderLoginBtn('.user-action');
-  renderAddProductBtn('.user-action');
+  renderLoginBtn('.user-action', 'login');
+  renderAddProductBtn('.user-action', 'add-product');
 }
-
 
 function addCartHandler() {
   const id = this.closest('.product').dataset.id;

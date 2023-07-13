@@ -47,7 +47,21 @@ form button {
   margin: 0 auto;
 }
 
-.button-icon{
+/* modal window styles */
+.modal-window-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.modal-window-close-btn:hover {
+  background: tomato;
+  color: white;
+}
+
+.button-icon {
   font-size: 30px;
   color: white;
   border: none;
@@ -55,22 +69,19 @@ form button {
   margin: 5px;
   cursor: pointer;
   transition: color .3s;
+  position: relative;
 }
-
-.button-icon::before{
-  color: rgb(0, 248, 0);
-}
-
-.button-icon:hover{
-  color: rgb(0, 248, 0);
-}
-
-.cart-close-btn {
+.button-icon::after {
+  content: attr(data-title);
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 10px;
-  cursor: pointer;
+  font-size: 10px;
+  text-transform: uppercase;
+  bottom: -10px;
+  transform: translateX(-50%);
+  left: 50%;
+}
+.button-icon:hover {
+  color: #c2ffc2;
 }
 
 .container {
@@ -95,13 +106,13 @@ form button {
   font-size: 20px;
 }
 
-.mini-cart {
-  border: none;
-  color: white;
-  font-size: 30px;
-  position: relative;
-  padding: 0;
+.user-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.mini-cart {}
 
 .mini-cart::before {
   content: attr(data-count);
@@ -172,8 +183,9 @@ form button {
   background: purple;
   color: white;
 }
-/* modal window */
-.madal-window{
+
+/* modal-window */
+.modal-window {
   position: fixed;
   z-index: 1000;
   
@@ -186,9 +198,9 @@ form button {
   background: white;
 }
 
-
 /* cart */
 .cart {}
+
 .cart-prods {
   padding-bottom: 20px;
   border-bottom: 5px solid silver;
@@ -288,7 +300,3 @@ form button {
 
 
 
-.cart-close-btn:hover {
-  background: tomato;
-  color: white;
-}
