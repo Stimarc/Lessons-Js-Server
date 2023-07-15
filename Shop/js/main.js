@@ -29,18 +29,16 @@ fetch(urls.products)
 // events
 btnCart.onclick = function() {
   if (!isCart) {
-
     fetch(urls.cart)
       .then(res => res.json())
       .then(data => {
         cart = data;
         renderCart(products, cart, 'body');
       });
-    
   } else {
     closeCart('.cart');
   }
-}
+};
 
 // FUNCTIONS -------------------------------------
 function renderLoginForm(insertSelector, renderClassName) {
@@ -52,7 +50,7 @@ function renderLoginForm(insertSelector, renderClassName) {
   const modalWindow = renderModalWindow('body', 'modal-window', 'Enter auth data');
   
   const 
-    loginForm  = doc.createElement('form'),
+    loginForm = doc.createElement('form'),
     loginInput = doc.createElement('input'),
     pwdInput = doc.createElement('input'),
     submitBtn = doc.createElement('button');
@@ -75,7 +73,6 @@ function renderLoginForm(insertSelector, renderClassName) {
   modalWindow.append(loginForm);
 }
 
-
 function renderLoginBtn(insertSelector, renderClassName) {
   const el = checkPresentElements(insertSelector, renderClassName);
   if (!el) {
@@ -92,7 +89,7 @@ function renderLoginBtn(insertSelector, renderClassName) {
   
   loginBtn.innerHTML = !isAuth
     ? '<i class="fa-solid fa-right-to-bracket"></i>'
-    : '<i class="fa-solid fa-right-from-bracket"></i>'
+    : '<i class="fa-solid fa-right-from-bracket"></i>';
 
   el.before(loginBtn);
 
@@ -119,8 +116,6 @@ function renderAddProductBtn(insertSelector, renderClassName) {
 
   parentEl.prepend(addProduct);
 }
-
-
 
 function renderProducts(dataArr, insertSelector) {
   for (let product of dataArr) {
@@ -164,7 +159,7 @@ function renderProduct(prodObj, insertSelector) {
   productPrice.innerHTML = price;
   
   addCart.className = 'add-cart';
-  addCart.innerHTML = 'Add cart'
+  addCart.innerHTML = 'Add cart';
   productPriceBlock.append(productPrice, addCart);
 
   productCategory.className = 'product-category';
@@ -197,7 +192,7 @@ function renderCart(dataArr, cartProdsObj, insertSelector) {
 
   const 
     cartTitle = doc.createElement('h3'),
-    cartProds = doc.createElement('ul');
+    cartProds = doc.createElement('ul'),
     cartCloseBtn = doc.createElement('button');
 
   const totalSum = getTotalCartSum(dataArr, cartProdsObj);
@@ -225,7 +220,7 @@ function renderCart(dataArr, cartProdsObj, insertSelector) {
   // cart events
   cartCloseBtn.onclick = function() {
     closeCart('.cart');
-  }
+  };
 }
 
 function closeCart(insertSelector) {
@@ -241,12 +236,12 @@ function closeCart(insertSelector) {
 function renderCartProds(dataArr, cartProdsObj, insertSelector) {
   let count = 1;
 
-  for (id in cartProdsObj) {
+  for (let id in cartProdsObj) {
     const qty = cartProdsObj[id];
     const prod = dataArr.find(item => item.id == id);
 
     renderCartProd(count, prod, qty, insertSelector);
-    count ++;
+    count++;
   }
 }
 
@@ -269,9 +264,9 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
 
     productPrice = doc.createElement('span'),
     productSum = doc.createElement('span'),
-    pruductDel = doc.createElement('button');
+    productDel = doc.createElement('button');
 
-  const {id, title, price} = prodObj;
+  const { id, title, price } = prodObj;
   const productSumValue = cartProdQty * price;
 
   product.className = 'cart-prod';
@@ -285,7 +280,7 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
 
   productQty.className = 'cart-prod-qty';
   productQtySpinerPlus.className = 'cart-prod-qty-spinner spinner-plus';
-  productQtySpinerPlus.innerHTML = '<i class="fa-solid fa-plus"></i>'
+  productQtySpinerPlus.innerHTML = '<i class="fa-solid fa-plus"></i>';
   productQtyInput.value = cartProdQty;
   productQtySpinerMinus.className = 'cart-prod-qty-spinner spinner-minus';
   productQtySpinerMinus.innerHTML = '<i class="fa-solid fa-minus"></i>';
@@ -296,8 +291,8 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
   productSum.className = 'cart-prod-sum';
   productSum.innerText = productSumValue;
 
-  pruductDel.className = 'cart-prod-del';
-  pruductDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  productDel.className = 'cart-prod-del';
+  productDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
 
   productQty.append(
     productQtySpinerPlus,
@@ -311,10 +306,63 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
     productQty,
     productPrice,
     productSum,
-    pruductDel
+    productDel
   );
 
   parentEl.append(product);
+
+  productQtySpinerPlus.onclick = function () {
+    const input = this.parentNode.querySelector('input');
+    const quantity = parseInt(input.value);
+    const newQuantity = quantity + 1;
+    input.value = newQuantity;
+
+    updateCartQuantity(id, newQuantity);
+    updateCartProductSum(productSum, newQuantity);
+    updateTotalSum();
+  };
+
+  productQtySpinerMinus.onclick = function () {
+    const input = this.parentNode.querySelector('input');
+    const quantity = parseInt(input.value);
+    if (quantity > 1) {
+      const newQuantity = quantity - 1;
+      input.value = newQuantity;
+
+      updateCartQuantity(id, newQuantity);
+      updateCartProductSum(productSum, newQuantity);
+      updateTotalSum();
+    }
+  };
+
+  productDel.onclick = function () {
+    const id = this.closest('.cart-prod').dataset.id;
+    delete cart[id];
+    this.closest('.cart-prod').remove();
+    updateTotalSum();
+  };
+}
+
+function updateCartQuantity(id, quantity) {
+  cart[id] = quantity;
+  
+}
+
+function updateCartProductSum(element, quantity) {
+  const id = element.closest('.cart-prod').dataset.id;
+  const prodObj = products.find(item => item.id == id);
+  const newSum = prodObj.price * quantity;
+  element.innerText = newSum;
+}
+
+function saveCartToServer() {
+  fetch(urls.cart, {
+    method: 'post',
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: JSON.stringify(cart)
+  });
 }
 
 function renderCartTotal(totalSum, insertSelector) {
@@ -323,9 +371,12 @@ function renderCartTotal(totalSum, insertSelector) {
     console.error(`[${insertSelector}]: Parent element not found !!!`);
     return false;
   }
+   
+  const totalValue = doc.createElement('span');
+  totalValue.className = 'cart-total-value';
+  totalValue.innerText = totalSum;
 
-  console.log(totalSum);
-  console.log(insertSelector);
+  parentEl.append(totalValue);
 }
 
 function getTotalCartSum(dataArr, cartProdsObj) {
@@ -340,6 +391,14 @@ function getTotalCartSum(dataArr, cartProdsObj) {
   }
 
   return total;
+}
+
+function updateTotalSum() {
+  const totalSum = getTotalCartSum(products, cart);
+  const totalValue = doc.querySelector('.cart-total-value');
+  if (totalValue) {
+    totalValue.innerText = totalSum;
+  }
 }
 
 function renderModalWindow(insertSelector, renderClassName, title) {
@@ -397,12 +456,26 @@ function checkPresentElements(insertSelector, renderClassName) {
 
 // HANDLERS
 function loginBtnHandler() {
+  const loginInput = doc.querySelector('input[name="login"]');
+  const pwdInput = doc.querySelector('input[name="pwd"]');
 
+  const login = loginInput.value;
+  const password = pwdInput.value;
 
-  isAuth = true;
+  fetch('/db.json')
+   .then(res => res.json())
+   .then(data => {
+    const users = data.users;
+    const user = users.find(u => u.login === login && u.pwd === password);
 
-  renderLoginBtn('.user-action', 'login');
-  renderAddProductBtn('.user-action', 'add-product');
+    if(user) {
+      isAuth = true;
+      renderLoginBtn('.user-action','login');
+      renderAddProductBtn('.user-action','add-product');
+    } else {
+      alert('Невірний логін або пароль');
+    }
+   });
 }
 
 function logoutBtnHandler() {
@@ -430,5 +503,4 @@ function addCartHandler() {
     });
 
   });
-  
 }

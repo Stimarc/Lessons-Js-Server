@@ -89,6 +89,13 @@ form button {
   margin: 0 auto;
 }
 
+h1 {
+  font-family: 'Courier New', Courier, monospace;
+  color: purple;
+  text-align: center;
+  padding: 20px;
+}
+
 .header {
   background: #2a2731;
   color: white;
