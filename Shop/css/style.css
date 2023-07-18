@@ -143,6 +143,7 @@ h1 {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 .product {
   border: 2px solid silver;
@@ -305,5 +306,39 @@ h1 {
 
 .cart-total-value {}
 
+/* pagination */
+.pagination{
+  font-size: 20;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.page-manage{
+  padding: 10px;
+  cursor: pointer;
+}
+.page-prev{
+  color: silver;
+}
+.page-next{}
+.pages{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.page{
+  padding: 10px;
+  cursor: pointer;
+}
+
+.page:hover {
+  border-color: orange;
+}
+
+.page-active{
+  background: orange;
+  color: white;
+}
 
 

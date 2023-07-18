@@ -41,10 +41,17 @@
       "category": "monitors",
       "img": "prod2.webp",
       "price": 19999
+    },
+    {
+      "id": 7,
+      "title": "Монітор 28 Samsung Odyssey G7 LS28BG702",
+      "category": "monitors",
+      "img": "prod2.webp",
+      "price": 19999
     }
   ],
   "cart": {
-    "1": 12,
+    "1": 13,
     "2": 7,
     "3": 14,
     "4": 13,
@@ -60,8 +67,8 @@
     },
     {
       "id": 2,
-      "login": "user",
-      "pwd": "456",
+      "login": "Dmytro",
+      "pwd": "123123",
       "role": "user"
     }
   ]
