@@ -21,8 +21,7 @@ let activePaginationPage = 1;
 
 renderLoginBtn('.user-action', 'login');
 renderAddProductBtn('.user-action', 'add-product');
-
-renderLoginForm('body', 'modal-window');
+// renderLoginForm('body', 'modal-window');
 
 // queries
 fetch(urls.products)
@@ -53,13 +52,14 @@ productsPerPageSelect.onchange = function() {
 
 // FUNCTIONS -------------------------------------
 function renderPagination(dataArr, insertSelector) {
-  const parentEl = checkPresentElements(insertSelector, 'pagination');
+  const parentEl = doc.querySelector(insertSelector,);
   if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
     return false;
   }
 
   let productPerPage = productsPerPageSelect
-    ? productsPerPageSelect.value
+    ? productsPerPageSelect?.value
     : 4;
 
   if (productPerPage === 'all') {
@@ -69,10 +69,10 @@ function renderPagination(dataArr, insertSelector) {
   let pageCount = Math.ceil(dataArr.length / productPerPage);
 
   parentEl.innerHTML = '';
-  for (let count = 1; count <= pageCount; count++) {
+  for (let count = 1; count <= pageCount; count ++) {
     const page = doc.createElement('li');
 
-    page.className = count;
+    page.className = (count === activePaginationPage) ? 'page active' : 'page';
     page.innerText = count;
 
     parentEl.append(page);

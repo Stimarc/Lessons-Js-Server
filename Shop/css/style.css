@@ -318,9 +318,7 @@ h1 {
   padding: 10px;
   cursor: pointer;
 }
-.page-prev{
-  color: silver;
-}
+.page-prev{}
 .page-next{}
 .pages{
   display: flex;
@@ -330,6 +328,7 @@ h1 {
 .page{
   padding: 10px;
   cursor: pointer;
+  border: 2px solid transparent;
 }
 
 .page:hover {
