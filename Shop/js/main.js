@@ -1,15 +1,246 @@
 const doc = document;
-const productsSelector = '.products';
-const cart = {
-  1: 2,
-  2: 1,
-  4: 5,
+const urls = {
+  products: 'http://localhost:3000/products',
+  cart: 'http://localhost:3000/cart',
+  pages: 'http://localhost:3000/products?page_'
 };
+const productsSelector = '.products';
+const btnCart = doc.querySelector('.mini-cart');
 
-renderProducts(products, productsSelector);
-renderCart(products, cart, 'body');
+const productPerPageSelect = doc.querySelector('.productPerPage select');
+
+let products = [];
+let cart = {};
+
+let isCart = false;
+let isAuth = true;
+
+let 
+activePaginationPage = 1,
+paginationItemQty = 0,
+paginationLimit  = 0,
+paginationPageQty = 0;
+
+
+// MAIN BLOCK =========================
+
+renderLoginBtn('.user-action', 'login');
+renderAddProductBtn('.user-action', 'add-product');
+// renderLoginForm('body', 'modal-window');
+
+// queries
+fetch(urls.products)
+  .then(res => res.json())
+  .then(data => {
+    products = data;
+    paginationItemQty = products.length;
+
+    paginationLimit = productPerPageSelect
+    ? productPerPageSelect?.value
+    : paginationItemQty;
+    
+    if (paginationLimit === 'all') {
+      paginationLimit = paginationItemQty;
+    }
+
+    renderProducts(products, productsSelector);
+    renderPagination(paginationItemQty, '.pages');
+  });
+
+// events
+btnCart.onclick = function() {
+  if (!isCart) {
+
+    fetch(urls.cart)
+      .then(res => res.json())
+      .then(data => {
+        cart = data;
+        renderCart(products, cart, 'body');
+      });
+    
+  } else {
+    closeCart('.cart');
+  }
+}
+
+productPerPageSelect.onchange = function() {
+  renderPagination(paginationItemQty, '.pages');
+}
+
+// FUNCTIONS -------------------------------------
+function renderPagination(paginationItemQty, insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+  if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+
+   const
+   btnPrev = doc.querySelector('.page-prev');
+   btnNext = doc.querySelector('.page-next');
+
+
+  paginationPageQty = Math.ceil(paginationItemQty / paginationLimit);
+  
+  
+
+  parentEl.innerHTML = '';
+  for (let count = 1; count <= paginationPageQty; count ++ ) {
+    const page = doc.createElement('li');
+
+    page.className = (count === activePaginationPage) ? 'page active' : 'page';
+    page.innerText = count;
+    page.dataset.count = count;
+
+    parentEl.append(page);
+
+     //events
+   page.onclick = () => paginationBtnHandler(count);
+
+  }
+  
+  
+
+  //events
+  btnPrev.onclick = () => paginationBtnHandler('prev');
+  btnNext.onclick = () => paginationBtnHandler('next')
+}
+
+function paginationBtnHandler(action) {
+  if (Number.isInteger(action)) {
+    activePaginationPage = action;
+  }
+
+  switch (action) {
+    case 'prev':
+      activePaginationPage --;
+      if (activePaginationPage <= 1) {
+        activePaginationPage = 1;
+      }
+      break;
+    case 'next':
+      activePaginationPage ++;
+      if (activePaginationPage >= paginationPageQty) {
+        activePaginationPage = paginationPageQty;
+      }
+      break;
+}
+
+  console.log(`page: ${activePaginationPage},limit: ${paginationLimit}`);
+  uiTogglePages()
+}
+
+function uiTogglePages() {
+  const paginationItemsEl = doc.querySelectorAll('.page');
+  const managePageBtnEl = doc.querySelector('.page-manage');
+
+  paginationItemsEl.forEach(item => {
+    if (Number(item.dataset.count) === activePaginationPage) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+
+  if (activePaginationPage === 1) {
+    managePageBtnEl[0].classList.add('unactive');
+    managePageBtnEl[1].classList.remove('unactive');
+  }
+
+  if (activePaginationPage === paginationPageQty) {
+    managePageBtnEl[1].classList.add('unactive');
+    managePageBtnEl[0].classList.remove('unactive');
+  }
+
+  if (paginationPageQty === 1) {
+    managePageBtnEl[1].classList.add('unactive');
+    managePageBtnEl[0].classList.add('unactive');
+  }
+}
+
+function renderLoginForm(insertSelector, renderClassName) {
+  const parentEl = checkPresentElements(insertSelector, renderClassName);
+  if (!parentEl) {
+    return false;
+  }
+
+  const modalWindow = renderModalWindow('body', 'modal-window', 'Enter auth data');
+  
+  const 
+    loginForm  = doc.createElement('form'),
+    loginInput = doc.createElement('input'),
+    pwdInput = doc.createElement('input'),
+    submitBtn = doc.createElement('button');
+
+  loginInput.name = 'login';
+  loginInput.placeholder = 'enter login';
+
+  pwdInput.name = 'pwd';
+  pwdInput.placeholder = 'enter pwd';
+  pwdInput.type = 'password';
+
+  submitBtn.innerText = 'login';
+
+  loginForm.append(
+    loginInput,
+    pwdInput,
+    submitBtn
+  );
+
+  modalWindow.append(loginForm);
+}
+
+function renderLoginBtn(insertSelector, renderClassName) {
+  const el = checkPresentElements(insertSelector, renderClassName);
+  if (!el) {
+    return false;
+  }
+
+  const loginBtn = doc.createElement('button');
+
+  loginBtn.className = `${renderClassName} button-icon`;
+  
+  loginBtn.dataset.title = !isAuth 
+    ? 'login'
+    : 'logout';
+  
+  loginBtn.innerHTML = !isAuth
+    ? '<i class="fa-solid fa-right-to-bracket"></i>'
+    : '<i class="fa-solid fa-right-from-bracket"></i>'
+
+  el.before(loginBtn);
+
+  // events
+  loginBtn.onclick = !isAuth
+    ? loginBtnHandler
+    : logoutBtnHandler;
+}
+
+function renderAddProductBtn(insertSelector, renderClassName) {
+  const parentEl = checkPresentElements(insertSelector, renderClassName);
+  if (!parentEl) {
+    return false;
+  }
+
+  if (!isAuth) {
+    return;
+  } 
+
+  const addProduct = doc.createElement('button');
+
+  addProduct.className = `${renderClassName} button-icon`;
+  addProduct.innerHTML = '<i class="fa-solid fa-calendar-plus"></i>';
+
+  parentEl.prepend(addProduct);
+}
 
 function renderProducts(dataArr, insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+  if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+
   for (let product of dataArr) {
     renderProduct(product, insertSelector);
   }
@@ -44,7 +275,7 @@ function renderProduct(prodObj, insertSelector) {
   productImgWrap.append(productImg);
 
   productTitle.className = 'product-title';
-  productTitle.innerText = title;
+  productTitle.innerHTML = title;
 
   productPriceBlock.className = 'product-price-block';
   productPrice.className = 'product-price';
@@ -77,47 +308,67 @@ function renderCart(dataArr, cartProdsObj, insertSelector) {
     return false;
   }
 
-  let cartElement = doc.querySelector('.cart');
-  if (cartElement) {
-    cartElement.remove();
+  let cart = doc.querySelector('.cart');
+  if (cart) {
+    cart.remove();
   }
-
-  cartElement = doc.createElement('div');
 
   const 
     cartTitle = doc.createElement('h3'),
     cartProds = doc.createElement('ul');
+    cartCloseBtn = doc.createElement('button');
 
   const totalSum = getTotalCartSum(dataArr, cartProdsObj);
 
-  cartElement.className = 'cart';
+  isCart = true;
+
+  cart = doc.createElement('div');
+  cart.className = 'cart modal-window';
 
   cartTitle.className = 'cart-title';
   cartTitle.innerText = 'Cart';
 
   cartProds.className = 'cart-prods';
 
-  parentEl.prepend(cartElement);
-  cartElement.append(cartTitle, cartProds);
+  cartCloseBtn.className = 'modal-window-close-btn';
+  cartCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+  parentEl.prepend(cart);
+  cart.append(cartTitle, cartProds, cartCloseBtn);
 
   // render cart component
-  renderCartProds(dataArr, cartProdsObj, '.cart-prods', dataArr, cartProdsObj);
+  renderCartProds(dataArr, cartProdsObj, '.cart-prods');
   renderCartTotal(totalSum, '.cart');
+
+  // cart events
+  cartCloseBtn.onclick = function() {
+    closeCart('.cart');
+  }
 }
 
-function renderCartProds(dataArr, cartProdsObj, insertSelector, dataArr, cartProdsObj) {
+function closeCart(insertSelector) {
+  const cart = doc.querySelector(insertSelector);
+
+  if (cart) {
+    cart.remove();
+  }
+
+  isCart = false;
+}
+
+function renderCartProds(dataArr, cartProdsObj, insertSelector) {
   let count = 1;
 
-  for (let id in cartProdsObj) {
+  for (id in cartProdsObj) {
     const qty = cartProdsObj[id];
     const prod = dataArr.find(item => item.id == id);
 
-    renderCartProd(count, prod, qty, insertSelector, dataArr, cartProdsObj);
+    renderCartProd(count, prod, qty, insertSelector);
     count ++;
   }
 }
 
-function renderCartProd(count, prodObj, cartProdQty, insertSelector, dataArr, cartProdsObj) {
+function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
   const parentEl = doc.querySelector(insertSelector);
   if (!parentEl) {
     console.error(`[${insertSelector}]: Parent element not found !!!`);
@@ -136,7 +387,7 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector, dataArr, ca
 
     productPrice = doc.createElement('span'),
     productSum = doc.createElement('span'),
-    productDel = doc.createElement('button');
+    pruductDel = doc.createElement('button');
 
   const {id, title, price} = prodObj;
   const productSumValue = cartProdQty * price;
@@ -152,9 +403,7 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector, dataArr, ca
 
   productQty.className = 'cart-prod-qty';
   productQtySpinerPlus.className = 'cart-prod-qty-spinner spinner-plus';
-  productQtySpinerPlus.innerHTML = '<i class="fa-solid fa-plus"></i>';
-
-
+  productQtySpinerPlus.innerHTML = '<i class="fa-solid fa-plus"></i>'
   productQtyInput.value = cartProdQty;
   productQtySpinerMinus.className = 'cart-prod-qty-spinner spinner-minus';
   productQtySpinerMinus.innerHTML = '<i class="fa-solid fa-minus"></i>';
@@ -165,8 +414,8 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector, dataArr, ca
   productSum.className = 'cart-prod-sum';
   productSum.innerText = productSumValue;
 
-  productDel.className = 'cart-prod-del';
-  productDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  pruductDel.className = 'cart-prod-del';
+  pruductDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
 
   productQty.append(
     productQtySpinerPlus,
@@ -180,47 +429,10 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector, dataArr, ca
     productQty,
     productPrice,
     productSum,
-    productDel
+    pruductDel
   );
 
   parentEl.append(product);
-
-  productQtySpinerPlus.onclick = function() {
-    const input = this.parentNode.querySelector('input');
-    const id = this.closest('.cart-prod').dataset.id;
-    const prod = dataArr.find(item => item.id == id);
-
-    let qty = parseInt(input.value);
-    if (qty < 10) {
-      qty++;
-      input.value = qty;
-      productSum.innerText = prod.price * qty;
-      cartProdsObj[id] = qty;
-      updateTotalSum();
-    }
-  };
-
-  productQtySpinerMinus.onclick = function() {
-    const input = this.parentNode.querySelector('input');
-    const id = this.closest('.cart-prod').dataset.id;
-    const prod = dataArr.find(item => item.id == id);
-
-    let qty = parseInt(input.value);
-    if (qty > 1) {
-      qty--;
-      input.value = qty;
-      productSum.innerText = prod.price * qty;
-      cartProdsObj[id] = qty;
-      updateTotalSum();
-    }
-  };
-
-  productDel.onclick = function() {
-    const id = this.closest('.cart-prod').dataset.id;
-    delete cartProdsObj[id];
-    this.closest('.cart-prod').remove();
-    updateTotalSum();
-  };
 }
 
 function renderCartTotal(totalSum, insertSelector) {
@@ -230,25 +442,8 @@ function renderCartTotal(totalSum, insertSelector) {
     return false;
   }
 
-  const cartTotal = doc.createElement('div');
-  const totalText = doc.createElement('span');
-  const totalValue = doc.createElement('span');
-
-  cartTotal.className = 'cart-total';
-  totalText.innerText = 'total: ';
-  totalValue.className = 'cart-total-value';
-  totalValue.innerText = totalSum;
-
-  cartTotal.append(totalText, totalValue);
-  parentEl.append(cartTotal);
-}
-
-function updateTotalSum() {
-  const totalSum = getTotalCartSum(products, cart);
-  const totalValue = doc.querySelector('.cart-total-value');
-  if (totalValue) {
-    totalValue.innerText = totalSum;
-  }
+  console.log(totalSum);
+  console.log(insertSelector);
 }
 
 function getTotalCartSum(dataArr, cartProdsObj) {
@@ -265,9 +460,93 @@ function getTotalCartSum(dataArr, cartProdsObj) {
   return total;
 }
 
-// events
+function renderModalWindow(insertSelector, renderClassName, title) {
+  const parentEl = checkPresentElements(insertSelector, renderClassName);
+  if (!parentEl) {
+    return false;
+  }
+
+  const 
+    modalWindow = doc.createElement('div'),
+    modalWindowTitle = doc.createElement('h3'),
+    modalWindowContent = doc.createElement('div'),
+    modalWindowCloseBtn = doc.createElement('button');
+
+  modalWindow.className = renderClassName;
+
+  modalWindowTitle.className = `${renderClassName}-title`;
+  modalWindowTitle.innerText = title;
+
+  modalWindowContent.className = `${renderClassName}-content`;
+
+  modalWindowCloseBtn.className = `${renderClassName}-close-btn`;
+  modalWindowCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+  parentEl.prepend(modalWindow);
+  modalWindow.append(
+    modalWindowTitle,
+    modalWindowContent,
+    modalWindowCloseBtn
+  );
+
+  // events
+
+  modalWindowCloseBtn.onclick = function() {
+    modalWindow.remove();
+  };
+
+  return modalWindowContent;
+}
+
+// additional function
+function checkPresentElements(insertSelector, renderClassName) {
+  const el = doc.querySelector(insertSelector);
+  const renderEl = doc.querySelector('.' + renderClassName);
+
+  renderEl && renderEl.remove();
+
+  if (!el) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+
+  return el;
+}
+
+// HANDLERS
+function loginBtnHandler() {
+
+
+  isAuth = true;
+
+  renderLoginBtn('.user-action', 'login');
+  renderAddProductBtn('.user-action', 'add-product');
+}
+
+function logoutBtnHandler() {
+  isAuth = false;
+
+  renderLoginBtn('.user-action', 'login');
+  renderAddProductBtn('.user-action', 'add-product');
+}
+
 function addCartHandler() {
   const id = this.closest('.product').dataset.id;
+  
+  fetch(urls.cart)
+  .then(res => res.json())
+  .then(data => {
+    cart = data;
+    cart[id] = !cart[id] ? 1 : cart[id] + 1;
 
-  cart[id] = !cart[id] ? 1 : cart[id] + 1;
+    fetch(urls.cart, {
+      method: 'post',
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: JSON.stringify(cart)
+    });
+
+  });
+  
 }

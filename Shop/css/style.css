@@ -37,6 +37,53 @@ button {
   background: transparent;
 }
 
+form input {
+  padding: 10px;
+  border: 1px solid silver;
+  margin-bottom: 5px;
+}
+
+form button {
+  margin: 0 auto;
+}
+
+/* modal window styles */
+.modal-window-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.modal-window-close-btn:hover {
+  background: tomato;
+  color: white;
+}
+
+.button-icon {
+  font-size: 30px;
+  color: white;
+  border: none;
+  padding: 0;
+  margin: 5px;
+  cursor: pointer;
+  transition: color .3s;
+  position: relative;
+}
+.button-icon::after {
+  content: attr(data-title);
+  position: absolute;
+  font-size: 10px;
+  text-transform: uppercase;
+  bottom: -10px;
+  transform: translateX(-50%);
+  left: 50%;
+}
+.button-icon:hover {
+  color: #c2ffc2;
+}
+
 .container {
   max-width: 1000px;
   margin: 0 auto;
@@ -59,13 +106,13 @@ button {
   font-size: 20px;
 }
 
-.mini-cart {
-  border: none;
-  color: white;
-  font-size: 30px;
-  position: relative;
-  padding: 0;
+.user-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.mini-cart {}
 
 .mini-cart::before {
   content: attr(data-count);
@@ -89,6 +136,7 @@ button {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 .product {
   border: 2px solid silver;
@@ -137,15 +185,8 @@ button {
   color: white;
 }
 
-h1 {
-  font-family: 'Courier New', Courier, monospace;
-  color: purple;
-  text-align: center;
-  padding: 20px;
-}
-
-/* cart */
-.cart {
+/* modal-window */
+.modal-window {
   position: fixed;
   z-index: 1000;
   
@@ -157,6 +198,10 @@ h1 {
   box-shadow: 5px 5px 15px rgba(0,0,0, .3);
   background: white;
 }
+
+/* cart */
+.cart {}
+
 .cart-prods {
   padding-bottom: 20px;
   border-bottom: 5px solid silver;
@@ -252,4 +297,42 @@ h1 {
   margin-right: 10px;
 }
 
-.cart-total-value {};
+.cart-total-value {}
+
+/* pagination */
+.pagination {
+  font-size: 20;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.page-manage {
+  padding: 10px;
+  cursor: pointer;
+}
+.page-prev {}
+.page-next {}
+.page-manage.unactive{
+  color: silver;
+}
+.pages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.page {
+  padding: 10px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.page:hover {
+  border-color: orange;
+}
+
+.page.active {
+  background: orange;
+  color: white;
+}
+
+
