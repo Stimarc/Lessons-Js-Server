@@ -2,7 +2,7 @@ const doc = document;
 const urls = {
   products: 'http://localhost:3000/products',
   cart: 'http://localhost:3000/cart',
-  pages: 'http://localhost:3000/products?page_'
+  pages: 'http://localhost:3000/products?_page'
 };
 const productsSelector = '.products';
 const btnCart = doc.querySelector('.mini-cart');
@@ -15,12 +15,10 @@ let cart = {};
 let isCart = false;
 let isAuth = true;
 
-let 
-activePaginationPage = 1,
-paginationItemQty = 0,
-paginationLimit  = 0,
-paginationPageQty = 0;
-
+let activePaginationPage = 1;
+let paginationItemQty = 0;
+let paginationLimit = 0;
+let paginationPageQty = 0;
 
 // MAIN BLOCK =========================
 
@@ -36,15 +34,21 @@ fetch(urls.products)
     paginationItemQty = products.length;
 
     paginationLimit = productPerPageSelect
-    ? productPerPageSelect?.value
-    : paginationItemQty;
-    
+      ? parseInt(productPerPageSelect.value)
+      : paginationItemQty;
+
     if (paginationLimit === 'all') {
       paginationLimit = paginationItemQty;
     }
 
-    renderProducts(products, productsSelector);
-    renderPagination(paginationItemQty, '.pages');
+    paginationPageQty = Math.ceil(paginationItemQty / paginationLimit);
+
+    fetch(urls.pages + `=${activePaginationPage}&_limit=${paginationLimit}`)
+      .then(res => res.json())
+      .then(data => {
+        renderProducts(data, productsSelector);
+        renderPagination(paginationItemQty, '.pages');
+      });
   });
 
 // events
@@ -57,14 +61,23 @@ btnCart.onclick = function() {
         cart = data;
         renderCart(products, cart, 'body');
       });
-    
+
   } else {
     closeCart('.cart');
   }
 }
 
 productPerPageSelect.onchange = function() {
+  //
+  paginationLimit = parseInt(productPerPageSelect.value);
   renderPagination(paginationItemQty, '.pages');
+
+  //
+  fetch(urls.pages + `=${activePaginationPage}&_limit=${paginationLimit}`)
+    .then(res => res.json())
+    .then(data => {
+      renderProducts(data, productsSelector);
+    });
 }
 
 // FUNCTIONS -------------------------------------
@@ -75,14 +88,21 @@ function renderPagination(paginationItemQty, insertSelector) {
     return false;
   }
 
-   const
-   btnPrev = doc.querySelector('.page-prev');
-   btnNext = doc.querySelector('.page-next');
+  const 
+    btnPrev = doc.querySelector('.page-prev'),
+    btnNext = doc.querySelector('.page-next');
 
+  activePaginationPage = 1;
 
-  paginationPageQty = Math.ceil(paginationItemQty / paginationLimit);
-  
-  
+  paginationLimit = productPerPageSelect
+    ? productPerPageSelect?.value
+    : paginationItemQty;
+
+    if (paginationLimit === 'all') {
+      paginationLimit = paginationItemQty;
+    }
+
+    paginationPageQty = Math.ceil(paginationItemQty / paginationLimit);
 
   parentEl.innerHTML = '';
   for (let count = 1; count <= paginationPageQty; count ++ ) {
@@ -94,16 +114,16 @@ function renderPagination(paginationItemQty, insertSelector) {
 
     parentEl.append(page);
 
-     //events
-   page.onclick = () => paginationBtnHandler(count);
-
+    //events
+    page.onclick = () => paginationBtnHandler(count);
   }
   
-  
+  uiTogglePages();
 
-  //events
+  // events
   btnPrev.onclick = () => paginationBtnHandler('prev');
-  btnNext.onclick = () => paginationBtnHandler('next')
+  btnNext.onclick = () => paginationBtnHandler('next');
+
 }
 
 function paginationBtnHandler(action) {
@@ -124,15 +144,22 @@ function paginationBtnHandler(action) {
         activePaginationPage = paginationPageQty;
       }
       break;
-}
+  }
 
-  console.log(`page: ${activePaginationPage},limit: ${paginationLimit}`);
-  uiTogglePages()
+
+  console.log(`page: ${activePaginationPage}, limit: ${paginationLimit}`);
+  uiTogglePages();
+
+  fetch(urls.pages + `=${activePaginationPage}&_limit=${paginationLimit}`)
+      .then(res => res.json())
+      .then(data => {
+        renderProducts(data, productsSelector);
+      })
 }
 
 function uiTogglePages() {
   const paginationItemsEl = doc.querySelectorAll('.page');
-  const managePageBtnEl = doc.querySelector('.page-manage');
+  const managePageBtnEl = doc.querySelectorAll('.page-manage');
 
   paginationItemsEl.forEach(item => {
     if (Number(item.dataset.count) === activePaginationPage) {
@@ -240,6 +267,7 @@ function renderProducts(dataArr, insertSelector) {
     console.error(`[${insertSelector}]: Parent element not found !!!`);
     return false;
   }
+  parentEl.innerHTML = '';
 
   for (let product of dataArr) {
     renderProduct(product, insertSelector);
