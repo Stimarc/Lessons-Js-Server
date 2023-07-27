@@ -2,21 +2,23 @@ const doc = document;
 const urls = {
   products: 'http://localhost:3000/products',
   cart: 'http://localhost:3000/cart',
+  pages: 'http://localhost:3000/products?_page'
 };
 const productsSelector = '.products';
 const btnCart = doc.querySelector('.mini-cart');
 
-const productsPerPageSelect = doc.querySelector('.productPerPage select');
-const pages = doc.querySelector('.pages');
+const productPerPageSelect = doc.querySelector('.productPerPage select');
 
 let products = [];
 let cart = {};
 
 let isCart = false;
-let isAuth = false;
+let isAuth = true;
 
 let activePaginationPage = 1;
-let productsPerPage = 4; // Значення за замовчуванням
+let paginationItemQty = 0;
+let paginationLimit = 0;
+let paginationPageQty = 0;
 
 // MAIN BLOCK =========================
 
@@ -29,63 +31,157 @@ fetch(urls.products)
   .then(res => res.json())
   .then(data => {
     products = data;
-    renderProducts(products, productsSelector);
-    renderPagination(products, '.pages');
+    paginationItemQty = products.length;
+
+    paginationLimit = productPerPageSelect
+      ? parseInt(productPerPageSelect.value)
+      : paginationItemQty;
+
+    if (paginationLimit === 'all') {
+      paginationLimit = paginationItemQty;
+    }
+
+    paginationPageQty = Math.ceil(paginationItemQty / paginationLimit);
+
+    fetch(urls.pages + `=${activePaginationPage}&_limit=${paginationLimit}`)
+      .then(res => res.json())
+      .then(data => {
+        renderProducts(data, productsSelector);
+        renderPagination(paginationItemQty, '.pages');
+      });
   });
 
 // events
 btnCart.onclick = function() {
   if (!isCart) {
+
     fetch(urls.cart)
       .then(res => res.json())
       .then(data => {
         cart = data;
         renderCart(products, cart, 'body');
       });
+
   } else {
     closeCart('.cart');
   }
-};
+}
 
-productsPerPageSelect.onchange = function() {
-  productsPerPage = parseInt(productsPerPageSelect.value);
-  activePaginationPage = 1; // Скидаємо активну сторінку на першу
-  renderProducts(products, productsSelector); // Перерендерюємо товари
-  renderPagination(products, '.pages'); // Перерендерюємо пагінацію
-};
+productPerPageSelect.onchange = function() {
+  //
+  paginationLimit = parseInt(productPerPageSelect.value);
+  renderPagination(paginationItemQty, '.pages');
+
+  //
+  fetch(urls.pages + `=${activePaginationPage}&_limit=${paginationLimit}`)
+    .then(res => res.json())
+    .then(data => {
+      renderProducts(data, productsSelector);
+    });
+}
 
 // FUNCTIONS -------------------------------------
-function renderPagination(dataArr, insertSelector) {
+function renderPagination(paginationItemQty, insertSelector) {
   const parentEl = doc.querySelector(insertSelector);
   if (!parentEl) {
     console.error(`[${insertSelector}]: Parent element not found !!!`);
     return false;
   }
 
-  let pageCount = Math.ceil(dataArr.length / productsPerPage);
+  const 
+    btnPrev = doc.querySelector('.page-prev'),
+    btnNext = doc.querySelector('.page-next');
+
+  activePaginationPage = 1;
+
+  paginationLimit = productPerPageSelect
+    ? productPerPageSelect?.value
+    : paginationItemQty;
+
+    if (paginationLimit === 'all') {
+      paginationLimit = paginationItemQty;
+    }
+
+    paginationPageQty = Math.ceil(paginationItemQty / paginationLimit);
 
   parentEl.innerHTML = '';
-  for (let count = 1; count <= pageCount; count++) {
+  for (let count = 1; count <= paginationPageQty; count ++ ) {
     const page = doc.createElement('li');
 
     page.className = (count === activePaginationPage) ? 'page active' : 'page';
     page.innerText = count;
+    page.dataset.count = count;
 
     parentEl.append(page);
-  }
 
-  console.log(`Products per page: ${productsPerPage}`);
-  console.log(`Page count: ${pageCount}`);
+    //events
+    page.onclick = () => paginationBtnHandler(count);
+  }
+  
+  uiTogglePages();
+
+  // events
+  btnPrev.onclick = () => paginationBtnHandler('prev');
+  btnNext.onclick = () => paginationBtnHandler('next');
+
 }
 
-function renderProducts(dataArr, insertSelector) {
-  const startIndex = (activePaginationPage - 1) * productsPerPage;
-  const endIndex = startIndex + productsPerPage;
-  const slicedData = dataArr.slice(startIndex, endIndex);
+function paginationBtnHandler(action) {
+  if (Number.isInteger(action)) {
+    activePaginationPage = action;
+  }
 
-  doc.querySelector(insertSelector).innerHTML = '';
-  for (let product of slicedData) {
-    renderProduct(product, insertSelector);
+  switch (action) {
+    case 'prev':
+      activePaginationPage --;
+      if (activePaginationPage <= 1) {
+        activePaginationPage = 1;
+      }
+      break;
+    case 'next':
+      activePaginationPage ++;
+      if (activePaginationPage >= paginationPageQty) {
+        activePaginationPage = paginationPageQty;
+      }
+      break;
+  }
+
+
+  console.log(`page: ${activePaginationPage}, limit: ${paginationLimit}`);
+  uiTogglePages();
+
+  fetch(urls.pages + `=${activePaginationPage}&_limit=${paginationLimit}`)
+      .then(res => res.json())
+      .then(data => {
+        renderProducts(data, productsSelector);
+      })
+}
+
+function uiTogglePages() {
+  const paginationItemsEl = doc.querySelectorAll('.page');
+  const managePageBtnEl = doc.querySelectorAll('.page-manage');
+
+  paginationItemsEl.forEach(item => {
+    if (Number(item.dataset.count) === activePaginationPage) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
+    }
+  });
+
+  if (activePaginationPage === 1) {
+    managePageBtnEl[0].classList.add('unactive');
+    managePageBtnEl[1].classList.remove('unactive');
+  }
+
+  if (activePaginationPage === paginationPageQty) {
+    managePageBtnEl[1].classList.add('unactive');
+    managePageBtnEl[0].classList.remove('unactive');
+  }
+
+  if (paginationPageQty === 1) {
+    managePageBtnEl[1].classList.add('unactive');
+    managePageBtnEl[0].classList.add('unactive');
   }
 }
 
@@ -96,11 +192,12 @@ function renderLoginForm(insertSelector, renderClassName) {
   }
 
   const modalWindow = renderModalWindow('body', 'modal-window', 'Enter auth data');
-
-  const loginForm = doc.createElement('form');
-  const loginInput = doc.createElement('input');
-  const pwdInput = doc.createElement('input');
-  const submitBtn = doc.createElement('button');
+  
+  const 
+    loginForm  = doc.createElement('form'),
+    loginInput = doc.createElement('input'),
+    pwdInput = doc.createElement('input'),
+    submitBtn = doc.createElement('button');
 
   loginInput.name = 'login';
   loginInput.placeholder = 'enter login';
@@ -111,31 +208,14 @@ function renderLoginForm(insertSelector, renderClassName) {
 
   submitBtn.innerText = 'login';
 
-  loginForm.append(loginInput, pwdInput, submitBtn);
+  loginForm.append(
+    loginInput,
+    pwdInput,
+    submitBtn
+  );
 
   modalWindow.append(loginForm);
-
-  submitBtn.onclick = function () {
-    const login = loginInput.value;
-    const password = pwdInput.value;
-
-    fetch('/db.json')
-      .then((res) => res.json())
-      .then((data) => {
-        const users = data.users;
-        const user = users.find((u) => u.login === login && u.pwd === password);
-
-        if (user) {
-          isAuth = true;
-          renderLoginBtn('.user-action', 'login');
-          renderAddProductBtn('.user-action', 'add-product');
-        } else {
-          alert('Невірний логін або пароль');
-        }
-      });
-  };
 }
-
 
 function renderLoginBtn(insertSelector, renderClassName) {
   const el = checkPresentElements(insertSelector, renderClassName);
@@ -146,17 +226,21 @@ function renderLoginBtn(insertSelector, renderClassName) {
   const loginBtn = doc.createElement('button');
 
   loginBtn.className = `${renderClassName} button-icon`;
-
-  loginBtn.dataset.title = !isAuth ? 'login' : 'logout';
-
+  
+  loginBtn.dataset.title = !isAuth 
+    ? 'login'
+    : 'logout';
+  
   loginBtn.innerHTML = !isAuth
     ? '<i class="fa-solid fa-right-to-bracket"></i>'
-    : '<i class="fa-solid fa-right-from-bracket"></i>';
+    : '<i class="fa-solid fa-right-from-bracket"></i>'
 
   el.before(loginBtn);
 
   // events
-  loginBtn.onclick = !isAuth ? loginBtnHandler : logoutBtnHandler;
+  loginBtn.onclick = !isAuth
+    ? loginBtnHandler
+    : logoutBtnHandler;
 }
 
 function renderAddProductBtn(insertSelector, renderClassName) {
@@ -167,7 +251,7 @@ function renderAddProductBtn(insertSelector, renderClassName) {
 
   if (!isAuth) {
     return;
-  }
+  } 
 
   const addProduct = doc.createElement('button');
 
@@ -178,6 +262,13 @@ function renderAddProductBtn(insertSelector, renderClassName) {
 }
 
 function renderProducts(dataArr, insertSelector) {
+  const parentEl = doc.querySelector(insertSelector);
+  if (!parentEl) {
+    console.error(`[${insertSelector}]: Parent element not found !!!`);
+    return false;
+  }
+  parentEl.innerHTML = '';
+
   for (let product of dataArr) {
     renderProduct(product, insertSelector);
   }
@@ -190,16 +281,17 @@ function renderProduct(prodObj, insertSelector) {
     return false;
   }
 
-  const product = doc.createElement('div');
-  const productImgWrap = doc.createElement('div');
-  const productImg = doc.createElement('img');
-  const productTitle = doc.createElement('h3');
-  const productPriceBlock = doc.createElement('div');
-  const productPrice = doc.createElement('span');
-  const addCart = doc.createElement('button');
-  const productCategory = doc.createElement('span');
+  const 
+    product = doc.createElement('div'),
+    productImgWrap = doc.createElement('div'),
+    productImg = doc.createElement('img'),
+    productTitle = doc.createElement('h3'),
+    productPriceBlock = doc.createElement('div'),
+    productPrice = doc.createElement('span'),
+    addCart = doc.createElement('button'),
+    productCategory = doc.createElement('span');
 
-  const { id, title, category, img, price } = prodObj;
+  const {id, title, category, img, price} = prodObj;
   const imgPath = `./img/products/${category}/${img}`;
 
   product.className = 'product';
@@ -216,15 +308,20 @@ function renderProduct(prodObj, insertSelector) {
   productPriceBlock.className = 'product-price-block';
   productPrice.className = 'product-price';
   productPrice.innerHTML = price;
-
+  
   addCart.className = 'add-cart';
-  addCart.innerHTML = 'Add cart';
+  addCart.innerHTML = 'Add cart'
   productPriceBlock.append(productPrice, addCart);
 
   productCategory.className = 'product-category';
   productCategory.innerText = category;
 
-  product.append(productImgWrap, productTitle, productPriceBlock, productCategory);
+  product.append(
+    productImgWrap,
+    productTitle,
+    productPriceBlock,
+    productCategory
+  );
 
   parentEl.append(product);
 
@@ -244,9 +341,10 @@ function renderCart(dataArr, cartProdsObj, insertSelector) {
     cart.remove();
   }
 
-  const cartTitle = doc.createElement('h3');
-  const cartProds = doc.createElement('ul');
-  const cartCloseBtn = doc.createElement('button');
+  const 
+    cartTitle = doc.createElement('h3'),
+    cartProds = doc.createElement('ul');
+    cartCloseBtn = doc.createElement('button');
 
   const totalSum = getTotalCartSum(dataArr, cartProdsObj);
 
@@ -273,7 +371,7 @@ function renderCart(dataArr, cartProdsObj, insertSelector) {
   // cart events
   cartCloseBtn.onclick = function() {
     closeCart('.cart');
-  };
+  }
 }
 
 function closeCart(insertSelector) {
@@ -289,12 +387,12 @@ function closeCart(insertSelector) {
 function renderCartProds(dataArr, cartProdsObj, insertSelector) {
   let count = 1;
 
-  for (let id in cartProdsObj) {
+  for (id in cartProdsObj) {
     const qty = cartProdsObj[id];
     const prod = dataArr.find(item => item.id == id);
 
     renderCartProd(count, prod, qty, insertSelector);
-    count++;
+    count ++;
   }
 }
 
@@ -305,20 +403,21 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
     return false;
   }
 
-  const product = doc.createElement('li');
-  const productNumber = doc.createElement('span');
-  const productTitle = doc.createElement('h4');
+  const 
+    product = doc.createElement('li'),
+    productNumber = doc.createElement('span'),
+    productTitle = doc.createElement('h4'),
 
-  const productQty = doc.createElement('label');
-  const productQtySpinerPlus = doc.createElement('span');
-  const productQtyInput = doc.createElement('input');
-  const productQtySpinerMinus = doc.createElement('span');
+    productQty = doc.createElement('label'),
+    productQtySpinerPlus = doc.createElement('span'),
+    productQtyInput = doc.createElement('input'),
+    productQtySpinerMinus = doc.createElement('span'),
 
-  const productPrice = doc.createElement('span');
-  const productSum = doc.createElement('span');
-  const productDel = doc.createElement('button');
+    productPrice = doc.createElement('span'),
+    productSum = doc.createElement('span'),
+    pruductDel = doc.createElement('button');
 
-  const { id, title, price } = prodObj;
+  const {id, title, price} = prodObj;
   const productSumValue = cartProdQty * price;
 
   product.className = 'cart-prod';
@@ -332,7 +431,7 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
 
   productQty.className = 'cart-prod-qty';
   productQtySpinerPlus.className = 'cart-prod-qty-spinner spinner-plus';
-  productQtySpinerPlus.innerHTML = '<i class="fa-solid fa-plus"></i>';
+  productQtySpinerPlus.innerHTML = '<i class="fa-solid fa-plus"></i>'
   productQtyInput.value = cartProdQty;
   productQtySpinerMinus.className = 'cart-prod-qty-spinner spinner-minus';
   productQtySpinerMinus.innerHTML = '<i class="fa-solid fa-minus"></i>';
@@ -343,10 +442,14 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
   productSum.className = 'cart-prod-sum';
   productSum.innerText = productSumValue;
 
-  productDel.className = 'cart-prod-del';
-  productDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  pruductDel.className = 'cart-prod-del';
+  pruductDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
 
-  productQty.append(productQtySpinerPlus, productQtyInput, productQtySpinerMinus);
+  productQty.append(
+    productQtySpinerPlus,
+    productQtyInput,
+    productQtySpinerMinus
+  );
 
   product.append(
     productNumber,
@@ -354,62 +457,10 @@ function renderCartProd(count, prodObj, cartProdQty, insertSelector) {
     productQty,
     productPrice,
     productSum,
-    productDel
+    pruductDel
   );
 
   parentEl.append(product);
-
-  productQtySpinerPlus.onclick = function() {
-    const input = this.parentNode.querySelector('input');
-    const quantity = parseInt(input.value);
-    const newQuantity = quantity + 1;
-    input.value = newQuantity;
-
-    updateCartQuantity(id, newQuantity);
-    updateCartProductSum(productSum, newQuantity);
-    updateTotalSum();
-  };
-
-  productQtySpinerMinus.onclick = function() {
-    const input = this.parentNode.querySelector('input');
-    const quantity = parseInt(input.value);
-    if (quantity > 1) {
-      const newQuantity = quantity - 1;
-      input.value = newQuantity;
-
-      updateCartQuantity(id, newQuantity);
-      updateCartProductSum(productSum, newQuantity);
-      updateTotalSum();
-    }
-  };
-
-  productDel.onclick = function() {
-    const id = this.closest('.cart-prod').dataset.id;
-    delete cart[id];
-    this.closest('.cart-prod').remove();
-    updateTotalSum();
-  };
-}
-
-function updateCartQuantity(id, quantity) {
-  cart[id] = quantity;
-}
-
-function updateCartProductSum(element, quantity) {
-  const id = element.closest('.cart-prod').dataset.id;
-  const prodObj = products.find(item => item.id == id);
-  const newSum = prodObj.price * quantity;
-  element.innerText = newSum;
-}
-
-function saveCartToServer() {
-  fetch(urls.cart, {
-    method: 'post',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify(cart),
-  });
 }
 
 function renderCartTotal(totalSum, insertSelector) {
@@ -419,11 +470,8 @@ function renderCartTotal(totalSum, insertSelector) {
     return false;
   }
 
-  const totalValue = doc.createElement('span');
-  totalValue.className = 'cart-total-value';
-  totalValue.innerText = totalSum;
-
-  parentEl.append(totalValue);
+  console.log(totalSum);
+  console.log(insertSelector);
 }
 
 function getTotalCartSum(dataArr, cartProdsObj) {
@@ -440,24 +488,17 @@ function getTotalCartSum(dataArr, cartProdsObj) {
   return total;
 }
 
-function updateTotalSum() {
-  const totalSum = getTotalCartSum(products, cart);
-  const totalValue = doc.querySelector('.cart-total-value');
-  if (totalValue) {
-    totalValue.innerText = totalSum;
-  }
-}
-
 function renderModalWindow(insertSelector, renderClassName, title) {
   const parentEl = checkPresentElements(insertSelector, renderClassName);
   if (!parentEl) {
     return false;
   }
 
-  const modalWindow = doc.createElement('div');
-  const modalWindowTitle = doc.createElement('h3');
-  const modalWindowContent = doc.createElement('div');
-  const modalWindowCloseBtn = doc.createElement('button');
+  const 
+    modalWindow = doc.createElement('div'),
+    modalWindowTitle = doc.createElement('h3'),
+    modalWindowContent = doc.createElement('div'),
+    modalWindowCloseBtn = doc.createElement('button');
 
   modalWindow.className = renderClassName;
 
@@ -470,7 +511,11 @@ function renderModalWindow(insertSelector, renderClassName, title) {
   modalWindowCloseBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
 
   parentEl.prepend(modalWindow);
-  modalWindow.append(modalWindowTitle, modalWindowContent, modalWindowCloseBtn);
+  modalWindow.append(
+    modalWindowTitle,
+    modalWindowContent,
+    modalWindowCloseBtn
+  );
 
   // events
 
@@ -498,26 +543,12 @@ function checkPresentElements(insertSelector, renderClassName) {
 
 // HANDLERS
 function loginBtnHandler() {
-  const loginInput = doc.querySelector('input[name="login"]');
-  const pwdInput = doc.querySelector('input[name="pwd"]');
 
-  const login = loginInput.value;
-  const password = pwdInput.value;
 
-  fetch('/db.json')
-    .then(res => res.json())
-    .then(data => {
-      const users = data.users;
-      const user = users.find(u => u.login === login && u.pwd === password);
+  isAuth = true;
 
-      if (user) {
-        isAuth = true;
-        renderLoginBtn('.user-action', 'login');
-        renderAddProductBtn('.user-action', 'add-product');
-      } else {
-        alert('Невірний логін або пароль');
-      }
-    });
+  renderLoginBtn('.user-action', 'login');
+  renderAddProductBtn('.user-action', 'add-product');
 }
 
 function logoutBtnHandler() {
@@ -529,19 +560,21 @@ function logoutBtnHandler() {
 
 function addCartHandler() {
   const id = this.closest('.product').dataset.id;
-
+  
   fetch(urls.cart)
-    .then(res => res.json())
-    .then(data => {
-      cart = data;
-      cart[id] = !cart[id] ? 1 : cart[id] + 1;
+  .then(res => res.json())
+  .then(data => {
+    cart = data;
+    cart[id] = !cart[id] ? 1 : cart[id] + 1;
 
-      fetch(urls.cart, {
-        method: 'post',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(cart),
-      });
+    fetch(urls.cart, {
+      method: 'post',
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: JSON.stringify(cart)
     });
+
+  });
+  
 }

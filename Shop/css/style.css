@@ -89,13 +89,6 @@ form button {
   margin: 0 auto;
 }
 
-h1 {
-  font-family: 'Courier New', Courier, monospace;
-  color: purple;
-  text-align: center;
-  padding: 20px;
-}
-
 .header {
   background: #2a2731;
   color: white;
@@ -307,35 +300,37 @@ h1 {
 .cart-total-value {}
 
 /* pagination */
-.pagination{
+.pagination {
   font-size: 20;
   font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.page-manage{
+.page-manage {
   padding: 10px;
   cursor: pointer;
 }
-.page-prev{}
-.page-next{}
-.pages{
+.page-prev {}
+.page-next {}
+.page-manage.unactive{
+  color: silver;
+}
+.pages {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.page{
+.page {
   padding: 10px;
   cursor: pointer;
   border: 2px solid transparent;
 }
-
 .page:hover {
   border-color: orange;
 }
 
-.page-active{
+.page.active {
   background: orange;
   color: white;
 }
