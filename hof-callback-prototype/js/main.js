@@ -1,36 +1,54 @@
-const arr = [1,2,3,5,-2,0,-7];
-
-
-Array.prototype.myForeach = myForeach;
-
-arr.myForeach();
-
-
+const arr = [1, 2, 3, 5, -2, 0, -7];
 
 // FOREACH -------------------------------
-function myForeach() {
-    console.log('My forEach array mathod')
-    console.log(this);
-}
+Array.prototype.myForeach = function(callback) {
+  for (let i = 0; i < this.length; i++) {
+    callback(this[i], i, this);
+  }
+};
+
+arr.myForeach((value, index) => {
+  console.log(`Value at index ${index}: ${value}`);
+});
+
 // MAP -------------------------------
-function myMap() {
-    console.log('My map array mathod')
-    
-}
+Array.prototype.myMap = function(callback) {
+  const result = [];
+  for (let i = 0; i < this.length; i++) {
+    result.push(callback(this[i], i, this));
+  }
+  return result;
+};
+
+const doubled = arr.myMap(value => value * 2);
+console.log(doubled);
+
 // FILTER -------------------------------
-function myFilter() {
-    console.log('My filter array mathod')
-    
-}
+Array.prototype.myFilter = function(callback) {
+  const result = [];
+  for (let i = 0; i < this.length; i++) {
+    if (callback(this[i], i, this)) {
+      result.push(this[i]);
+    }
+  }
+  return result;
+};
+
+const positiveNumbers = arr.myFilter(value => value > 0);
+console.log(positiveNumbers);
+
 // FIND -------------------------------
-function myFind() {
-    console.log('My find array mathod')
-    
-}
+Array.prototype.myFind = function(callback) {
+  for (let i = 0; i < this.length; i++) {
+    if (callback(this[i], i, this)) {
+      return this[i];
+    }
+  }
+  return undefined;
+};
 
-
-
-
+const foundNumber = arr.myFind(value => value < 0);
+console.log(foundNumber);
 
 
 
