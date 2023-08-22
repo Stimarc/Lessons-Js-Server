@@ -1,0 +1,101 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+li {
+    list-style: none;
+}
+
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* 1-10px, 2-20px 3-30px */
+.mt-2 {
+    margin-top: 20px;
+}
+.mb-2 {
+    margin-bottom: 20px;
+}
+.mb-a {
+    margin-bottom: auto;
+}
+
+.films-section {}
+
+.films {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    overflow: hidden;
+}
+
+.film {
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+    max-width: 300px;
+    min-width: 300px;
+    padding: 20px;
+    border: 1px solid silver;
+}
+.film:hover .film__back {
+    transform: translateY(0);
+    opacity: 1;
+    cursor: pointer;
+}
+
+.film__header {}
+.film__front {}
+.film__back {
+    padding: 20px;
+    background: rgba(0, 0, 0, .7);
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: 
+        transform .3s,
+        opacity .3s;
+}
+
+.film__name {}
+.film__alt-name {}
+.film__year {}
+
+.film__genres {
+    display: flex;
+    flex-wrap: wrap;
+}
+.film__genre {}
+.film__genre::after {
+    content: ',';
+    margin-right: 5px;
+}
+.film__genre:last-child::after {
+    content: '.';
+    margin-right: 0;
+}
+
+.film__countries {}
+.film__country {}
+
+.film__description {
+    
+}
+
+.film__rates {}
+.film__rate {}
+.film__rate span {}
+.film__rate span:first-child {}
+.film__rate span:last-child {}
