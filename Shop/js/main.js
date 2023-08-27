@@ -1,7 +1,6 @@
 const doc = document;
 const page = checkPage();
 
-
 switch (page) {
   case 'shop':
     renderProds(products, '.shop', shopBtnHandler);
@@ -14,27 +13,56 @@ switch (page) {
 
   case 'order':
     const btnSubmit = doc.querySelector('button');
+    const buyButton = doc.getElementById('buyButton');
 
-    console.log('order');
     btnSubmit.onclick = function() {
       const user = getUserData();
-      setUserToLs(user);
-    }
+
+      if (user) {
+        setUserToLs(user);
+        window.location.href = 'final.html';
+      }
+    };
+
+    buyButton.onclick = orderBtnHandler;
     break;
 
   case 'final':
-    console.log('final');
+    renderFinalData();
     break;
 
   default:
     alert('404 page not found');
 }
 
-
 // FUNCITONS
+function renderFinalData() {
+  const userBlock = doc.querySelector('.user-data-block');
+  const prodBlock = doc.querySelector('.prod-data-block');
+
+  const userString = getUserFromLs('user');
+  const user = JSON.parse(userString);
+
+  const productId = getProdFromLs('productId');
+  const product = products.find(prod => prod.id == productId);
+
+  if (user && product) {
+    doc.getElementById('userName').textContent = user.name;
+    doc.getElementById('userEmail').textContent = user.email;
+    doc.getElementById('userPhone').textContent = user.phone;
+
+    doc.getElementById('productName').textContent = product.name;
+    doc.getElementById('productPrice').textContent = product.price;
+  } else {
+    userBlock.innerHTML = '<p>Customer information not found.</p>';
+    prodBlock.innerHTML = '<p>Product information not found.</p>';
+  }
+}
+
 function renderProds(dataArr, selector, btnHandler) {
   dataArr.forEach(prod => renderProd(prod, selector, btnHandler));
 }
+
 function renderProd(data, selector, btnHandler) {
   const { id, name, price } = data;
 
@@ -53,11 +81,7 @@ function renderProd(data, selector, btnHandler) {
   prodLinkEl.innerText = 'buy';
   prodLinkEl.dataset.id = id;
 
-  prodEl.append(
-    prodNameEl,
-    prodPriceEl,
-    prodLinkEl
-  );
+  prodEl.append(prodNameEl, prodPriceEl, prodLinkEl);
 
   parentEl.append(prodEl);
 
@@ -139,28 +163,45 @@ function getUserPhone(form) {
   return phone;
 }
 
+
 // btnHandlers
 function shopBtnHandler() {
   const id = this.dataset.id;
   setProdToLS(id);
   window.location.href = 'single.html';
 }
+
 function singleBtnHandler() {
   const id = this.dataset.id;
   setProdToLS(id);
   window.location.href = 'order.html';
 }
 
+function orderBtnHandler() {
+  const id = getProdFromLs('productId');
+  const user = getUserData();
+
+  if (user) {
+    setUserToLs(user);
+    window.location.href = `final.html?productId=${id}`;
+  }
+}
+
+
+
 // localStorage
 function setProdToLS(id) {
   localStorage.setItem('productId', id);
 }
+
 function getProdFromLs(key) {
   return localStorage.getItem(key);
 }
+
 function setUserToLs(userObj) {
   localStorage.setItem('user', JSON.stringify(userObj));
 }
+
 function getUserFromLs(key) {
   const user = localStorage.getItem('user');
   return user;
@@ -168,6 +209,5 @@ function getUserFromLs(key) {
 
 function checkPage() {
   const page = doc.body.dataset.page;
-
   return page;
 }
