@@ -10,16 +10,10 @@ const headers = {
 const resourses = {
     health: '/v1/health',
     movies: {
-        movie: '/v1.3/movie?page=2&limit=10'
+        movie: '/v1.3/movie'
     }
 }
 
-getMovies()
-    .then(data => renderMovies(data.docs, '.films'));
-
-function renderMovies(filmsArr, parentElSelector) {
-    filmsArr.forEach(film => rendeMovie(film, parentElSelector));
-}
 
 function rendeMovie(filmObj, parentElSelector) {
     const parentEl = doc.querySelector(parentElSelector);
@@ -87,21 +81,29 @@ function rendeMovie(filmObj, parentElSelector) {
     parentEl.append(film);
 }
 
-async function getMovies() {
-    const url = baseUrl + resourses.movies.movie;
-
+async function getMovies(page, limit, sortBy) {
+    const url = baseUrl + `/v1.3/movie?page=${page}&limit=${limit}&sortBy=${sortBy}`;
     headers['X-API-KEY'] = token;
 
     try {
         const res = await fetch(url, { headers });
         const data = await res.json();
-
-        console.log(data);
         return data;
     } catch (err) {
         console.warn('failed request', err);
     }
 }
+
+function renderMovies(filmsArr, parentElSelector) {
+    filmsArr.forEach(film => rendeMovie(film, parentElSelector));
+}
+
+const currentPage = 1;
+const moviesPerPage = 10;
+const sortingCriteria = "rating"; 
+
+getMovies(currentPage, moviesPerPage, sortingCriteria)
+    .then(data => renderMovies(data.docs, '.films'));
 
 async function getHealth() {
     const url = baseUrl + resourses.health;
