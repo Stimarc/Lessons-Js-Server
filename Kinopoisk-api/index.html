@@ -10,12 +10,29 @@
 </head>
 
 <body>
-    <div class="container">
-        <section class="films-section">
-            <h2>Films</h2>
-            <div class="films"></div>
-        </section>
+    <section class="films-section">
+        <h2>Films</h2>
+        <div class="films"></div>
+        <div class="pagination">
+            <button class="prev-btn">Previous</button>
+            <button class="next-btn">Next</button>
+        </div>
+    </section>
+    
+    <div class="sort-section">
+        <h3>Sort By:</h3>
+        <label>
+            <input type="radio" name="sort" value="year"> Year
+        </label>
+        <label>
+            <input type="radio" name="sort" value="rating"> Rating
+        </label>
+        <label>
+            <input type="radio" name="sort" value="name"> Name
+        </label>
     </div>
+
+    <!--JS-->
     <script src="./js/main.js"></script>
 </body>
 
