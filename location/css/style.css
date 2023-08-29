@@ -1,0 +1,14 @@
+body {
+    font-family: sans-serif;
+}
+
+.container{
+    max-width: 900px;
+}
+
+li{
+    list-style: none;
+    text-align: center;
+    border: 2px solid grey;
+}
+
