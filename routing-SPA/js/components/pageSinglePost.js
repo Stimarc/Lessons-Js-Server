@@ -1,5 +1,10 @@
-export function pageSinglePost() {
+export function pageSinglePost(id) {
+  const postData = { id: id, title: 'Заголовок поста', body: 'Текст поста' };
+
   return (
-    `<h2>Single post</h2>`
+    `<div class="single-post">
+      <h2>${postData.title}</h2>
+      <p>${postData.body}</p>
+    </div>`
   );
 }
