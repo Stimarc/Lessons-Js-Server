@@ -24,10 +24,32 @@ export const getPerson = async (id) => {
   return person;
 };
 
-
-export async function getPlanet(id) {
+export const getPlanet = async (id) => {
   const res = await fetch(`${baseUrl}planets/${id}/`, { headers });
   const planet = await res.json();
   return planet;
-}
+};
 
+export const getFilm = async (id) => {
+  const res = await fetch(`${baseUrl}films/${id}/`, { headers });
+  const film = await res.json();
+  return film;
+};
+
+export const getSpecies = async (id) => {
+  const res = await fetch(`${baseUrl}species/${id}/`, { headers });
+  const species = await res.json();
+  return species;
+};
+
+export const getStarship = async (id) => {
+  const res = await fetch(`${baseUrl}starships/${id}/`, { headers });
+  const starship = await res.json();
+  return starship;
+};
+
+export const getVehicle = async (id) => {
+  const res = await fetch(`${baseUrl}vehicles/${id}/`, { headers });
+  const vehicle = await res.json();
+  return vehicle;
+};
