@@ -1,1 +1,0 @@
-{"version":3,"file":"main.2f58b3aec45a449734f6.js","mappings":";;;;;AAAA;;AAEA,kB","sources":["webpack://lessons-js-server/./src/index.js"],"sourcesContent":["const mult = (a,b) => a * b;\n\nconsole.log(mult);"],"names":[],"sourceRoot":""}

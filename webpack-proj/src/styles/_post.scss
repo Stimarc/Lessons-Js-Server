@@ -1,0 +1,12 @@
+.post {
+  padding: 20px;
+  border: 1px solid white;
+  user-select: none;
+  &__title {
+    padding-bottom: 5px;
+    border-bottom: 3px solid silver;
+  }
+  &__content {
+    padding: 10px;
+  }
+}
